@@ -12,15 +12,14 @@ import (
 )
 
 var (
-	scanner   = bufio.NewScanner(os.Stdin)
 	low       = flag.Int("low", 1, "Lowest number to start range")
 	high      = flag.Int("high", 100, "Highest number to end range")
-	timeLimit = flag.Int64("time-limit", 10, "Set the total time the game will take")
+	timeLimit = flag.Int64("time-limit", 15, "Set the total time the game will take")
 )
 
 type Game struct {
-	answer int
-	guess  string
+	answer     int
+	difficulty int
 }
 
 func loadGame() *Game {
@@ -34,39 +33,59 @@ func loadGame() *Game {
 }
 
 func (game *Game) runGame() {
-	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
+	timer := time.NewTicker(time.Second * time.Duration(*timeLimit))
+	done := make(chan bool)
 
-	answerCh := make(chan string)
-	fmt.Println("Make your guess:")
+	scanner := bufio.NewScanner(os.Stdin)
+
+	var userAnswer string
+	numTries := 0
+
 	go func() {
-		scanner.Scan()
-		userAnswer := scanner.Text()
-		answerCh <- userAnswer
+
+		fmt.Println("Make your guess:")
+	gameLoop:
+		for scanner.Scan() {
+
+			userAnswer = scanner.Text()
+			userNumber, err := strconv.Atoi(userAnswer)
+			fatalError("Failed to parse Number", err)
+
+			if userNumber == game.answer {
+				fmt.Println("You got it right. Kudos!")
+				done <- true
+				break gameLoop
+			}
+
+			if userNumber != game.answer {
+				fmt.Print("Incorrect! ")
+				fmt.Println("Enter your guess: ")
+
+				numTries++
+
+				if numTries > 5 {
+					fmt.Println("You have exceeded all chances. Try again.")
+					done <- true
+					break gameLoop
+				}
+
+				continue gameLoop
+			}
+
+		}
 	}()
 
 	select {
+	case <-done:
 	case <-timer.C:
-		fmt.Println("Time Ran out. Please try again.")
-
-	case guessed := <-answerCh:
-		guessedNum, err := strconv.Atoi(guessed)
-		fatalError("Error in parsing number", err)
-
-		if guessedNum == game.answer {
-			fmt.Println("You got it correct! Kudos!!")
-			close(answerCh)
-		} else {
-			fmt.Println("Got wrong answer")
-		}
-
+		fmt.Println("time's up, too bad you didn't get it.")
 	}
 
-	return
 }
 
 func main() {
 	fmt.Println(`
-		Number guessing game cli!
+		Welcome to the Number Guessing Game!
 		I'm thinking of a number between 1 and 100.
 		You have 5 chances to guess the correct number.
 		`)
