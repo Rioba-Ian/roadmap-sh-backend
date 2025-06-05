@@ -2,11 +2,14 @@
 
 A simple command-line number guessing game where the computer generates a random number and the user has to guess it. The user selects a difficulty level that determines the number of chances they have to guess correctly. The game also has a time limit, after which it automatically ends. If the user guesses correctly within the time and attempt limits, they win!
 
+![Game Screenshot](./images/guess-game.png)
+
 ## Installation
 
 ### Method 1: Using Git and Go
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/Rioba-Ian/roadmap-sh-backend.git
    cd roadmap-sh-backend/go-number-guessing
@@ -30,11 +33,13 @@ go-number-guessing
 ## Command Line Flags
 
 The game supports several command line flags:
+
 - `--low`: Set the lowest number in the range (default: 1)
 - `--high`: Set the highest number in the range (default: 100)
 - `--time-limit`: Set the time limit in seconds (default: 15)
 
 Example:
+
 ```bash
 ./guess-game --low=10 --high=50 --time-limit=30
 ```
