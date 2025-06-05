@@ -15,7 +15,7 @@ import (
 var (
 	low       = flag.Int("low", 1, "Lowest number to start range")
 	high      = flag.Int("high", 100, "Highest number to end range")
-	timeLimit = flag.Int64("time-limit", 15, "Set the total time the game will take")
+	timeLimit = flag.Int64("time-limit", 60, "Set the total time the game will take")
 )
 
 type Game struct {
@@ -44,8 +44,9 @@ func (game *Game) runGame(wg *sync.WaitGroup) {
 	numTries := 0
 
 	go func() {
-		game.Difficulty()
+		chances := game.Difficulty()
 
+		fmt.Println("game difficulty::", chances)
 		fmt.Println("Make your guess:")
 	gameLoop:
 		for scanner.Scan() {
@@ -61,12 +62,16 @@ func (game *Game) runGame(wg *sync.WaitGroup) {
 			}
 
 			if userNumber != game.answer {
-				fmt.Print("Incorrect! ")
+				if userNumber > game.answer {
+					fmt.Println("Incorrect! The number is less than ", userNumber)
+				} else {
+					fmt.Println("Incorrect! The number is greater than ", userNumber)
+				}
 				fmt.Println("Enter your guess: ")
 
 				numTries++
 
-				if numTries > 5 {
+				if numTries > chances {
 					fmt.Println("You have exceeded all chances. Try again.")
 					done <- true
 					break gameLoop
@@ -86,7 +91,7 @@ func (game *Game) runGame(wg *sync.WaitGroup) {
 
 }
 
-func (game Game) Difficulty() {
+func (game Game) Difficulty() int {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	fmt.Println(`Please select the difficulty level:
@@ -113,6 +118,7 @@ func (game Game) Difficulty() {
 		fmt.Println("Great! You have selected the Hard level")
 	}
 
+	return game.chances
 }
 
 func main() {
