@@ -89,3 +89,7 @@ You got it right. Kudos!
 3. Enter your guesses when prompted.
 4. Try to guess the correct number within the time limit and allowed number of attempts.
 5. If you guess correctly, you win! If you run out of time or attempts, the game will end.
+
+### Acknowledgments
+
+This project is part of the Roadmap.sh backend repository. You can check out the project ![here](https://roadmap.sh/projects/number-guessing-game).Special thanks to the contributors who made this project possible.
