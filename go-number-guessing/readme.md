@@ -1,6 +1,6 @@
 # Number Guessing Game CLI
 
-A simple command-line number guessing game where the computer generates a random number and the user has to guess it. The user selects a difficulty level that determines the number of chances they have to guess correctly. The game also has a time limit, after which it automatically ends. If the user guesses correctly within the time and attempt limits, they win!
+A simple command-line number guessing game where the computer generates a random number and the user has to guess it . The user selects a difficulty level that determines the number of chances they have to guess correctly. The game also has a time limit, after which it automatically ends. If the user guesses correctly within the time and attempt limits, they win!
 
 ![Game Screenshot](./images/guess-game.png)
 
