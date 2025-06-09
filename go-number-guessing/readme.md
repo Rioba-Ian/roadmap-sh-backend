@@ -92,4 +92,4 @@ You got it right. Kudos!
 
 ### Acknowledgments
 
-This project is part of the Roadmap.sh backend repository. You can check out the project [here](https://roadmap.sh/projects/number-guessing-game).Special thanks to the contributors who made this project possible.
+This project is part of the Roadmap.sh backend repository. You can check out the project [here](https://roadmap.sh/projects/number-guessing-game).
