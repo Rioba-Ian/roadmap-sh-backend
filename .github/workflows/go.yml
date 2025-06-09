@@ -24,4 +24,4 @@ jobs:
         run: go build ./go-number-guessing/main.go
 
       - name: Test
-        run: go test -v ./...
+        run: go test -v .
