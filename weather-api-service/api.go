@@ -6,6 +6,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+
+	"github.com/joho/godotenv"
 )
 
 type APIServer struct {
@@ -36,7 +40,17 @@ func (s *APIServer) Run() error {
 }
 
 func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/nairobi?unitGroup=metric&include=days%2Ccurrent%2Chours&key=5M9ZW8K38956LGNUVN695WQTR&contentType=json")
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	err = godotenv.Load(filepath.Join(pwd, "./.env"))
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	resp, err := http.Get(fmt.Sprintf("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/nairobi?unitGroup=metric&include=days%%2Ccurrent%%2Chours&key=%s&contentType=json", os.Getenv("WEATHER_API_KEY")))
 	if err != nil {
 		log.Fatalf("Failed to get response %v", err)
 	}
