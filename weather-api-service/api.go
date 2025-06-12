@@ -13,9 +13,7 @@ type APIServer struct {
 }
 
 type ApiResponse struct {
-	Address   string  `json:"address"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	data WeatherRes
 }
 
 func NewAPIServer(addr string) *APIServer {
@@ -26,27 +24,7 @@ func NewAPIServer(addr string) *APIServer {
 
 func (s *APIServer) Run() error {
 	router := http.NewServeMux()
-	router.HandleFunc("/weather", func(http.ResponseWriter, *http.Request) {
-		resp, err := http.Get("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/nairobi?unitGroup=us&include=days&key=5M9ZW8K38956LGNUVN695WQTR&contentType=json")
-		if err != nil {
-			log.Fatalf("Failed to get response %v", err)
-		}
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatalf("error reading response body %v", err)
-		}
-
-		var apiResponse ApiResponse
-		if err := json.Unmarshal(body, &apiResponse); err != nil {
-			log.Fatalf("Error unmarshalling Json %v", err)
-		}
-
-		fmt.Printf("The city is: %s\n", apiResponse.Address)
-
-	})
-
+	router.HandleFunc("/weather", handleWeatherResp)
 	server := http.Server{
 		Addr:    s.addr,
 		Handler: router,
@@ -55,4 +33,37 @@ func (s *APIServer) Run() error {
 	log.Printf("Server has started on %s", s.addr)
 
 	return server.ListenAndServe()
+}
+
+func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
+	resp, err := http.Get("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/nairobi?unitGroup=metric&include=days%2Ccurrent%2Chours&key=5M9ZW8K38956LGNUVN695WQTR&contentType=json")
+	if err != nil {
+		log.Fatalf("Failed to get response %v", err)
+	}
+	r.Header.Set("Content-Type", "application/json")
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("error reading response body %v", err)
+	}
+
+	var apiResponse ApiResponse
+	if err := json.Unmarshal(body, &apiResponse.data); err != nil {
+		log.Fatalf("Error unmarshalling Json %v", err)
+		return
+	}
+
+	indentedJson, err := json.MarshalIndent(apiResponse.data, "", "  ")
+	if err != nil {
+		fmt.Println("Error marshalling JSON with indent:", err)
+		return
+	}
+
+	fmt.Println(string(indentedJson))
+
+	fmt.Printf("The city is: %s\n", apiResponse.data.Address)
+
+	w.Write(indentedJson)
+
 }
