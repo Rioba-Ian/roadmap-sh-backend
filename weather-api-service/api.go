@@ -42,9 +42,6 @@ func (s *APIServer) Run() error {
 		if err := json.Unmarshal(body, &apiResponse); err != nil {
 			log.Fatalf("Error unmarshalling Json %v", err)
 		}
-		prettyJson, err := json.Indent(apiResponse, "", "\t")
-
-		fmt.Println(prettyJson)
 
 		fmt.Printf("The city is: %s\n", apiResponse.Address)
 
