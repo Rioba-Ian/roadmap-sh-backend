@@ -27,7 +27,10 @@ func NewAPIServer(addr string) *APIServer {
 
 func (s *APIServer) Run() error {
 	router := http.NewServeMux()
+
+	router.HandleFunc("/", handleHomeHandler)
 	router.HandleFunc("/weather", handleWeatherResp)
+
 	server := http.Server{
 		Addr:    s.addr,
 		Handler: router,
@@ -40,11 +43,20 @@ func (s *APIServer) Run() error {
 
 func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
 
+	city := r.URL.Query().Get("city")
+
+	if city == "" {
+		http.Error(w, "City parameter is missing. Usage: /weather?city=yourcity", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Printf("The city chosen= %s", city)
+
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	resp, err := http.Get(fmt.Sprintf("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/nairobi?unitGroup=metric&include=days%%2Ccurrent%%2Chours&key=%s&contentType=json", os.Getenv("WEATHER_API_KEY")))
+	resp, err := http.Get(fmt.Sprintf("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/%s?unitGroup=metric&include=days%%2Ccurrent%%2Chours&key=%s&contentType=json", city, os.Getenv("WEATHER_API_KEY")))
 	if err != nil {
 		log.Fatalf("Failed to get response %v", err)
 	}
@@ -72,6 +84,11 @@ func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("The city is: %s\n", apiResponse.data.Address)
 
+	w.WriteHeader(http.StatusOK)
 	w.Write(indentedJson)
+}
 
+func handleHomeHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+	w.Write([]byte("Welcome to weather api, use /weather?city='Your city' to interact with service."))
 }
