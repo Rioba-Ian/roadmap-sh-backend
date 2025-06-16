@@ -11,7 +11,7 @@ COPY weather-api-service/go.mod weather-api-service/go.sum ./
 RUN go mod download
 
 # Copy the source code into the container
-COPY weather-api-service/ .
+COPY . ./app
 
 
 # Build the Go application
