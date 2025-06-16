@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/joho/godotenv"
 )
 
 type APIServer struct {
@@ -27,8 +26,18 @@ func NewAPIServer(addr string) *APIServer {
 }
 
 func NewRedisClient() *redis.Client {
+	redisHost := os.Getenv("REDIS_HOST")
+	if redisHost == "" {
+		redisHost = "localhost"
+	}
+	
+	redisPort := os.Getenv("REDIS_PORT")
+	if redisPort == "" {
+		redisPort = "6379"
+	}
+	
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     redisHost + ":" + redisPort,
 		Password: "",
 		DB:       0,
 	})
@@ -63,10 +72,6 @@ func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Printf("The city chosen= %s\n", city)
-
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	resp, err := http.Get(fmt.Sprintf("https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/%s?unitGroup=metric&include=days%%2Ccurrent%%2Chours&key=%s&contentType=json", city, os.Getenv("WEATHER_API_KEY")))
 	if err != nil {
