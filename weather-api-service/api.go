@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/joho/godotenv"
 )
@@ -40,13 +39,8 @@ func (s *APIServer) Run() error {
 }
 
 func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
-	pwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
 
-	err = godotenv.Load(filepath.Join(pwd, "./.env"))
-	if err != nil {
+	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
