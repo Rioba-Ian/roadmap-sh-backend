@@ -72,4 +72,8 @@ jobs:
         with:
           go-version: '1.23'
       - name: Build workspace
-        run: go work sync && go build ./...
+        run: |
+          go work sync
+          mkdir -p build
+          go build -o build/guess-game ./go-number-guessing
+          go build -o build/weather-api ./weather-api-service
