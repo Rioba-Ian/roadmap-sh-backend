@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/joho/godotenv"
 )
 
@@ -25,11 +26,22 @@ func NewAPIServer(addr string) *APIServer {
 	}
 }
 
+func NewRedisClient() *redis.Client {
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	return client
+}
+
 func (s *APIServer) Run() error {
 	router := http.NewServeMux()
+	redisClient := NewRedisClient()
 
 	router.HandleFunc("/", handleHomeHandler)
-	router.HandleFunc("/weather", handleWeatherResp)
+	router.Handle("/weather", CacheMiddleware(redisClient)(http.HandlerFunc(handleWeatherResp)))
 
 	server := http.Server{
 		Addr:    s.addr,
@@ -50,7 +62,7 @@ func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("The city chosen= %s", city)
+	fmt.Printf("The city chosen= %s\n", city)
 
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
@@ -68,6 +80,13 @@ func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("error reading response body %v", err)
 	}
 
+	if resp.StatusCode == 400 {
+		fmt.Println("Failed to retrive data: Bad API Request:Invalid location parameter value.")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Bad API Request:Invalid location parameter value."))
+		return
+	}
+
 	var apiResponse ApiResponse
 	if err := json.Unmarshal(body, &apiResponse.data); err != nil {
 		log.Fatalf("Error unmarshalling Json %v", err)
@@ -82,7 +101,7 @@ func handleWeatherResp(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(string(indentedJson))
 
-	fmt.Printf("The city is: %s\n", apiResponse.data.Address)
+	fmt.Printf("The city is: %s\n", apiResponse.data.ResolvedAddress)
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(indentedJson)
