@@ -1,7 +1,4 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
-name: Go
+name: Monorepo CI
 
 on:
   push:
@@ -10,18 +7,69 @@ on:
     branches: ['main']
 
 jobs:
-  build:
+  detect-changes:
     runs-on: ubuntu-latest
+    outputs:
+      number-guessing: ${{ steps.changes.outputs.number-guessing }}
+      weather-api: ${{ steps.changes.outputs.weather-api }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            number-guessing:
+              - 'go-number-guessing/**'
+            weather-api:
+              - 'weather-api-service/**'
 
+  build-number-guessing:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.number-guessing == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./go-number-guessing
+
+    steps:
+      - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.23'
-
       - name: Build
-        run: go build ./go-number-guessing/main.go
-
+        run: go build -o guess-game
       # - name: Test
-      #   run: go test -v .
+      #   run: go test -v ./...
+
+  build-weather-api:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.weather-api == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./weather-api-service
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+      - name: Build
+        run: go build -o weather-api
+      # - name: Test
+      #   run: go test -v ./...
+
+  build-all:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.number-guessing == 'true' || needs.detect-changes.outputs.weather-api == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+      - name: Build workspace
+        run: go work sync && go build ./...
