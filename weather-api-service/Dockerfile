@@ -13,7 +13,6 @@ RUN go mod download
 # Copy the source code into the container
 COPY weather-api-service/ .
 
-COPY .env .
 
 # Build the Go application
 RUN go build -o main .
