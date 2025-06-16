@@ -5,7 +5,7 @@ FROM golang:1.23-alpine AS builder
 WORKDIR /app
 
 # Copy go modules
-COPY weather-api-service/go.mod weather-api-service/go.sum ./
+COPY go.mod go.sum ./
 
 # Download go modules
 RUN go mod download
