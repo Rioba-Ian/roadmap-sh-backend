@@ -6,7 +6,7 @@ This is a weather API service that provides weather information for a given loca
 
 ## Installation
 
-### Method 1: Using Git and Go
+### Method 1: Using Docker
 
 1. Clone the repository:
 

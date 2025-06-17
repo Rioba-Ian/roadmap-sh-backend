@@ -94,4 +94,4 @@ weather-api-service-app-1    | cache-miss
 weather-api-service-app-1    | cache-hit
 ```
 
-For a detailed documentation you can visit the projects readme.
+For a detailed documentation you can visit the projects [README](./weather-api-service/README.md).
