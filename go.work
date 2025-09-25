@@ -3,4 +3,5 @@ go 1.22.3
 use (
 	./go-number-guessing
 	./weather-api-service
+	./blog-api
 )

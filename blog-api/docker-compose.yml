@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  blog-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080' # Map host port 8080 to container port 8080
+    environment:
+      POSTGRES_HOST: postgres_db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: rioba
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blog_db
+    depends_on:
+      - postgres_db
+    networks:
+      - app_network
+
+  postgres_db:
+    image: postgres:15-alpine # Using a lightweight Postgres image
+    environment:
+      POSTGRES_USER: rioba
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blog_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist database data
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
