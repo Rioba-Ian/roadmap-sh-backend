@@ -60,10 +60,28 @@ jobs:
         run: go build -o weather-api
       # - name: Test
       #   run: go test -v ./...
+  build-blog-api:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.blog-api == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./blog-api
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+      - name: Build
+        run: go build -o blog-api
+      # - name: Test
+      #   run: go test -v ./...
 
   build-all:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.number-guessing == 'true' || needs.detect-changes.outputs.weather-api == 'true' }}
+    if: ${{ needs.detect-changes.outputs.number-guessing == 'true' || needs.detect-changes.outputs.weather-api == 'true' || needs.detect-changes.outputs.blog-api == 'true' || needs.detect-changes.outputs.blog-api == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -77,3 +95,4 @@ jobs:
           mkdir -p build
           go build -o build/guess-game ./go-number-guessing
           go build -o build/weather-api ./weather-api-service
+          go build -o build/blog-api ./blog-api
