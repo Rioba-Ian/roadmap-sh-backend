@@ -20,6 +20,8 @@ services:
 
   postgres_db:
     image: postgres:15-alpine # Using a lightweight Postgres image
+    ports:
+      - '5432:5432'
     environment:
       POSTGRES_USER: rioba
       POSTGRES_PASSWORD: password

@@ -1,7 +1,25 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+
+	"github.com/Rioba-Ian/blog-api/database"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	fmt.Println("It's great to be back in go land...")
+	router := gin.Default()
+	database.Connect()
+
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "Welcome to blog api service.",
+		})
+	})
+
+	router.GET("/posts", GetPosts)
+	router.GET("/posts/:id", GetPost)
+
+	router.Run(":8080")
+
 }
