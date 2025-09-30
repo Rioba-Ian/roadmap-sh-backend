@@ -19,6 +19,7 @@ func main() {
 
 	router.GET("/posts", GetPosts)
 	router.GET("/posts/:id", GetPost)
+	router.POST("/posts/", CreatePost)
 
 	router.Run(":8080")
 
