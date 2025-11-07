@@ -44,12 +44,11 @@ func Connect() {
 func SeedDatabase(db *gorm.DB) error {
 	blogs := []models.Blog{
 		{
-			ID:       "1",
 			Title:    "My First Blog Post",
 			Content:  "This is the content of my first blog post.",
 			Category: "tech",
 		},
-		{ID: "2", Title: "My Second Blog Post", Content: "This is the content of my second blog post.", Category: "tech"},
+		{Title: "My Second Blog Post", Content: "This is the content of my second blog post.", Category: "tech"},
 	}
 
 	for _, blog := range blogs {

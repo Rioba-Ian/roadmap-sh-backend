@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Rioba-Ian/blog-api/models"
@@ -60,6 +61,12 @@ func CreatePost(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&blog); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Could not create post: ", err)})
+		return
+	}
+
+	if err := CreateBlog(&blog); err != nil {
+		log.Fatalln("could not save post to db", err)
+		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
