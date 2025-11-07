@@ -8,6 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetPosts godoc
+// @Summary Get All Posts
+// @Schemes
+// @Description Get all posts and details
+// @Tags home
+// @Accept json
+// @Produce json
+// @Success 200 [array] Returns  array of all posts
+// @Failure 404 {object} httputil.HTTPError
+// @Failure 500 {object} httputil.HTTPError
+// @Router / [get]
+
 func GetPosts(ctx *gin.Context) {
 	var blogs []models.Blog
 
@@ -18,6 +30,12 @@ func GetPosts(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, blogs)
 }
+
+//	@swagger:route	GET /posts/{id} posts getPost
+// Get a post by ID
+// responses:
+//   200: postResponse
+//   400: errorResponse
 
 func GetPost(ctx *gin.Context) {
 	var blog models.Blog
@@ -30,6 +48,12 @@ func GetPost(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, blog)
 }
+
+//	@swagger:route	POST /posts posts createPost
+// Create a new post
+// responses:
+//   201: postResponse
+//   400: errorResponse
 
 func CreatePost(ctx *gin.Context) {
 	var blog models.Blog

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/Rioba-Ian/blog-api/database"
 
 	"github.com/Rioba-Ian/blog-api/models"
@@ -24,6 +26,7 @@ func GetBlogByID(blog *models.Blog, id string) error {
 
 func CreateBlog(blog *models.Blog) error {
 	if err := database.DB.Create(blog).Error; err != nil {
+		log.Fatalln("could not create post", err)
 		return err
 	}
 

@@ -9,23 +9,28 @@ services:
       - '8080:8080' # Map host port 8080 to container port 8080
     environment:
       POSTGRES_HOST: postgres_db
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: rioba
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: blog_db
+      POSTGRES_PORT: ${DB_PORT}
+      POSTGRES_USERNAME: ${DB_USER}
+      POSTGRESQL_PASSWORD: ${DB_PASSWORD}
+      POSTGRESQL_DATABASE: ${DB_NAME}
     depends_on:
       - postgres_db
     networks:
       - app_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
+      interval: 1s
+      timeout: 5s
+      retries: 5
 
   postgres_db:
     image: postgres:15-alpine # Using a lightweight Postgres image
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_USER: rioba
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: blog_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data # Persist database data
     networks:
