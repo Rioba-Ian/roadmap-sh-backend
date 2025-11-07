@@ -52,7 +52,7 @@ func SeedDatabase(db *gorm.DB) error {
 	}
 
 	for _, blog := range blogs {
-		err := db.FirstOrCreate(&blog, models.Blog{Title: blog.Title, Content: blog.Content}).Error
+		err := db.Create(&blog).Error
 		if err != nil {
 			return err
 		}
