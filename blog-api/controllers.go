@@ -39,10 +39,10 @@ func GetPosts(ctx *gin.Context) {
 //   400: errorResponse
 
 func GetPost(ctx *gin.Context) {
-	var blog models.Blog
+	var blogs []models.Blog
 	id := ctx.Param(":id")
 
-	if err := GetBlogByID(&blog, id); err != nil {
+	if err := GetBlogByID(&blogs, id); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
