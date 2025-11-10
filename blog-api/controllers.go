@@ -74,3 +74,17 @@ func CreatePost(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, blog)
 }
+
+func DeletePost(ctx *gin.Context) {
+	var blog models.Blog
+	id := ctx.Param("id")
+
+	if err := Delete(&blog, id); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server error occured",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "ok"})
+}
