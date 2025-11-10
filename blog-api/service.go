@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/Rioba-Ian/blog-api/database"
-	"gorm.io/gorm"
 
 	"github.com/Rioba-Ian/blog-api/models"
 )
@@ -18,15 +17,10 @@ func GetAllBlogs(blogs *[]models.Blog) error {
 	return nil
 }
 
-func GetBlogByID(blogs *[]models.Blog, id string) error {
-	result := database.DB.Where("id = ?", id).Find(blogs)
-
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			fmt.Errorf("Record not found")
-		} else {
-			fmt.Errorf("Error retrieving user", result.Error)
-		}
+func GetBlogByID(blog *models.Blog, id string) error {
+	if err := database.DB.Where("id = ?", id).First(&blog).Error; err != nil {
+		fmt.Println("Error getting blog by id", id, err)
+		fmt.Errorf("Record not found", blog, id)
 	}
 
 	return nil
