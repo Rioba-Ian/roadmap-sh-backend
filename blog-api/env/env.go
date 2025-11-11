@@ -24,7 +24,7 @@ const (
 func Load() error {
 
 	if os.Getenv("DB_USER") != "" && os.Getenv("DB_HOST") != "" {
-		log.Println("Env variables already loaded from Docker env_file")
+		log.Println("Env variables already loaded from the deployment platform")
 		return nil
 	}
 
