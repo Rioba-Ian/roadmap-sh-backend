@@ -17,11 +17,6 @@ services:
       - postgres_db
     networks:
       - app_network
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
-      interval: 1s
-      timeout: 5s
-      retries: 5
 
   postgres_db:
     image: postgres:15-alpine # Using a lightweight Postgres image
@@ -35,6 +30,11 @@ services:
       - postgres_data:/var/lib/postgresql/data # Persist database data
     networks:
       - app_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      interval: 1s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
