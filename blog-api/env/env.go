@@ -1,6 +1,7 @@
 package env
 
 import (
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -21,5 +22,18 @@ const (
 )
 
 func Load() error {
+
+	if os.Getenv("DB_USER") != "" && os.Getenv("DB_HOST") != "" {
+		log.Println("Env variables already loaded from Docker env_file")
+		return nil
+	}
+
+	err := godotenv.Load(".env.prod")
+	if err != nil {
+		log.Println("Loaded env variables from the .env.prod")
+		return nil
+	}
+
+	log.Println("No .env.prod found, trying .env")
 	return godotenv.Load(".env")
 }

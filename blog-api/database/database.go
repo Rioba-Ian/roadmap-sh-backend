@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/Rioba-Ian/blog-api/env"
 	"github.com/Rioba-Ian/blog-api/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -22,8 +21,7 @@ func Connect() {
 	dbName := os.Getenv("DB_NAME")
 	dbPort := os.Getenv("DB_PORT")
 
-	fmt.Println("dbHost", env.PostgresDefaultDatabase)
-
+	fmt.Println("dbHost:", dbHost, "dbUser:", dbUser, "dbName:", dbName, "dbPort:", dbPort)
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", dbHost, dbUser, dbPassword, dbName, dbPort)
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
