@@ -27,7 +27,3 @@ jobs:
           context: ./blog-api/
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/blog:latest
-
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/blog:latest
