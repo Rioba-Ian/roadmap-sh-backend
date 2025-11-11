@@ -13,10 +13,10 @@ func (key EnvKey) GetValue() string {
 }
 
 const (
-	PostgresUser            EnvKey = "POSTGRES_USER"
+	PostgresUser            EnvKey = "DB_USER"
 	PostgresPassword        EnvKey = "DB_PASSWORD"
 	PostgresDefaultDatabase EnvKey = "DB_NAME"
-	PostgresDatabaseAddress EnvKey = "POSTGRES_DB_ADDRESS"
+	PostgresDatabaseAddress EnvKey = "DB_HOST"
 	PostgresDatabasePort    EnvKey = "DB_PORT"
 )
 

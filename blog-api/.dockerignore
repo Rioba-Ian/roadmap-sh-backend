@@ -53,3 +53,7 @@ tests/
 *.tmp
 *.temp
 .cache/
+
+.env
+.env.prod
+.env.dev

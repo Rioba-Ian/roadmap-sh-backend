@@ -34,7 +34,7 @@ import (
 func main() {
 	// load env
 	if err := env.Load(); err != nil {
-		log.Fatal("Failed to load env variables...")
+		log.Fatal("Failed to load env variables...", err)
 	}
 
 	router := gin.Default()

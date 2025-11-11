@@ -6,28 +6,30 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '8080:8080' # Map host port 8080 to container port 8080
-    environment:
-      - .env
+      - '8080:8080'
+    env_file:
+      - ./.env.prod
     depends_on:
       - postgres_db
     networks:
       - app_network
 
   postgres_db:
-    image: postgres:15-alpine # Using a lightweight Postgres image
+    image: postgres:15-alpine
     ports:
       - '5432:5432'
+    env_file:
+      - ./.env.prod
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Persist database data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app_network
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d blog']
       interval: 1s
       timeout: 5s
       retries: 5
