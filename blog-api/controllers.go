@@ -88,3 +88,25 @@ func DeletePost(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "ok"})
 }
+
+func UpdatePost(ctx *gin.Context) {
+	var blog models.Blog
+	id := ctx.Param("id")
+
+	if err := ctx.ShouldBindJSON(&blog); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Could not find post: ", err)})
+		return
+	}
+
+	fmt.Println("The blog post for update::", blog)
+
+	if err := Update(&blog, id); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal Server error occured",
+		})
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "ok"})
+}

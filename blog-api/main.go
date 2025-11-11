@@ -47,6 +47,7 @@ func main() {
 	router.GET("/posts/:id", GetPost)
 	router.POST("/posts/", CreatePost)
 	router.DELETE("/posts/:id", DeletePost)
+	router.PUT("posts/:id", UpdatePost)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Run(":8080")

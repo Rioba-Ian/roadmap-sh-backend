@@ -44,13 +44,8 @@ func Delete(blog *models.Blog, id string) error {
 }
 
 func Update(blog *models.Blog, id string) error {
-	if err := database.DB.Model(&blog).Updates(models.Blog{
-		Base:     models.Base{},
-		Title:    blog.Title,
-		Content:  blog.Title,
-		Category: blog.Category,
-		Tags:     blog.Tags,
-	}).Error; err != nil {
+
+	if err := database.DB.Model(&models.Blog{}).Where("id = ?", id).Updates(&blog).Error; err != nil {
 		log.Fatalln("Could not update post", err)
 		fmt.Errorf("Could not update post", err)
 	}
