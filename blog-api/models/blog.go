@@ -22,7 +22,7 @@ type Blog struct {
 	Title     string         `json:"title"`
 	Content   string         `json:"content"`
 	Category  string         `json:"category"`
-	Tags      pq.StringArray `json:"tags" gorm:"type:text[]"`
+	Tags      pq.StringArray `json:"tags" gorm:"type:text[]" swaggertype:"array,string"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 }

@@ -96,3 +96,26 @@ weather-api-service-app-1    | cache-hit
 
 For a detailed documentation you can visit the projects [README](./weather-api-service/README.md).
 The project is attributed to [Roadmapsh backend track](https://roadmap.sh/projects/weather-api-wrapper-service).
+
+### Project 3 - Blogging Platform API
+
+_Blogging Platform API_
+
+The project is attributed to [Roadmapsh backend track](https://roadmap.sh/projects/blogging-platform-api).
+You are required to create a simple RESTful API with basic CRUD operations for a personal blogging platform. CRUD stands for Create, Read, Update, and Delete.
+
+### Goals
+
+- The goals of this project are to help you:
+
+- Understand what the RESTful APIs are including best practices and conventions
+
+- Learn how to create a RESTful API
+
+- Learn about common HTTP methods like GET, POST, PUT, PATCH, DELETE
+
+- Learn about status codes and error handling in APIs
+
+- Learn how to perform CRUD operations using an API
+
+- Learn how to work with databases

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Rioba-Ian/blog-api/httputil"
 	"github.com/Rioba-Ian/blog-api/models"
 	"github.com/gin-gonic/gin"
 )
@@ -16,28 +17,32 @@ import (
 // @Tags home
 // @Accept json
 // @Produce json
-// @Success 200 [array] Returns  array of all posts
+// @Success 200 {object}  []models.Blog
 // @Failure 404 {object} httputil.HTTPError
 // @Failure 500 {object} httputil.HTTPError
-// @Router / [get]
-
+// @Router /posts/ [get]
 func GetPosts(ctx *gin.Context) {
 	var blogs []models.Blog
 
 	if err := GetAllBlogs(&blogs); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	ctx.JSON(http.StatusOK, blogs)
 }
 
-//	@swagger:route	GET /posts/{id} posts getPost
-// Get a post by ID
-// responses:
-//   200: postResponse
-//   400: errorResponse
-
+// GetPost godoc
+// @Summary Get a Post by ID
+// @Schemes
+// @Description Get a post by ID
+// @Tags home
+// @Accept json
+// @Produce json
+// @Success 200 {object}  models.Blog
+// @Failure 404 {object} httputil.HTTPError
+// @Failure 500 {object} httputil.HTTPError
+// @Router /posts/{id} [get]
 func GetPost(ctx *gin.Context) {
 	var blog models.Blog
 	id := ctx.Param("id")
@@ -52,12 +57,17 @@ func GetPost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, blog)
 }
 
-//	@swagger:route	POST /posts posts createPost
-// Create a new post
-// responses:
-//   201: postResponse
-//   400: errorResponse
-
+// CreatePost godoc
+// @Summary Create a new post
+// @Schemes
+// @Description Create a new post
+// @Tags home
+// @Accept json
+// @Produce json
+// @Success 201 {object}  models.Blog
+// @Failure 400 {object} httputil.HTTPError
+// @Failure 500 {object} httputil.HTTPError
+// @Router /posts/ [post]
 func CreatePost(ctx *gin.Context) {
 	var blog models.Blog
 
@@ -75,6 +85,17 @@ func CreatePost(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, blog)
 }
 
+// DeletePost godoc
+// @Summary Delete a post
+// @Schemes
+// @Description Delete a post
+// @Tags home
+// @Accept json
+// @Produce json
+// @Success 200 {string}  string
+// @Failure 404 {object} httputil.HTTPError
+// @Failure 500 {object} httputil.HTTPError
+// @Router /posts/ [delete]
 func DeletePost(ctx *gin.Context) {
 	var blog models.Blog
 	id := ctx.Param("id")
@@ -89,6 +110,17 @@ func DeletePost(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "ok"})
 }
 
+// UpdatePost godoc
+// @Summary Update a post
+// @Schemes
+// @Description Update a post
+// @Tags home
+// @Accept json
+// @Produce json
+// @Success 200 {string}  string
+// @Failure 404 {object} httputil.HTTPError
+// @Failure 500 {object} httputil.HTTPError
+// @Router /posts/ [put]
 func UpdatePost(ctx *gin.Context) {
 	var blog models.Blog
 	id := ctx.Param("id")
