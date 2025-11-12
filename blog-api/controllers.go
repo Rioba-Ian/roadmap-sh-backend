@@ -42,7 +42,7 @@ func GetPosts(ctx *gin.Context) {
 // @Success 200 {object}  models.Blog
 // @Failure 404 {object} httputil.HTTPError
 // @Failure 500 {object} httputil.HTTPError
-// @Router /posts/{id} [get]
+// @Router /posts/{id}{id} [get]
 func GetPost(ctx *gin.Context) {
 	var blog models.Blog
 	id := ctx.Param("id")
@@ -95,7 +95,7 @@ func CreatePost(ctx *gin.Context) {
 // @Success 200 {string}  string
 // @Failure 404 {object} httputil.HTTPError
 // @Failure 500 {object} httputil.HTTPError
-// @Router /posts/ [delete]
+// @Router /posts/{id} [delete]
 func DeletePost(ctx *gin.Context) {
 	var blog models.Blog
 	id := ctx.Param("id")
@@ -120,7 +120,7 @@ func DeletePost(ctx *gin.Context) {
 // @Success 200 {string}  string
 // @Failure 404 {object} httputil.HTTPError
 // @Failure 500 {object} httputil.HTTPError
-// @Router /posts/ [put]
+// @Router /posts/{id} [put]
 func UpdatePost(ctx *gin.Context) {
 	var blog models.Blog
 	id := ctx.Param("id")

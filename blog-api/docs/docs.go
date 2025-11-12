@@ -84,39 +84,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
-                "description": "Update a post",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "home"
-                ],
-                "summary": "Update a post",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/httputil.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/httputil.HTTPError"
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Create a new post",
                 "consumes": [
@@ -138,6 +105,41 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/httputil.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/posts/{id}": {
+            "put": {
+                "description": "Update a post",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "home"
+                ],
+                "summary": "Update a post",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/httputil.HTTPError"
                         }
@@ -184,7 +186,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/posts/{id}": {
+        "/posts/{id}{id}": {
             "get": {
                 "description": "Get a post by ID",
                 "consumes": [
