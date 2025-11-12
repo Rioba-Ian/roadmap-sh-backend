@@ -106,6 +106,8 @@ You are required to create a simple RESTful API with basic CRUD operations for a
 
 Demo
 
+You can access the API docs at this link [API Docs](https://roadmapsh-blogsapi-u6lnni-a7b247-49-12-198-51.traefik.me/swagger/index.html)
+
 ![](./blog-api/swag-screenshot.png)
 
 ### Goals
