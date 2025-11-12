@@ -42,7 +42,7 @@ func GetPosts(ctx *gin.Context) {
 // @Success 200 {object}  models.Blog
 // @Failure 404 {object} httputil.HTTPError
 // @Failure 500 {object} httputil.HTTPError
-// @Router /posts/{id}{id} [get]
+// @Router /posts/{id} [get]
 func GetPost(ctx *gin.Context) {
 	var blog models.Blog
 	id := ctx.Param("id")

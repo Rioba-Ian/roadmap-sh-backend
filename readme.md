@@ -104,6 +104,10 @@ _Blogging Platform API_
 The project is attributed to [Roadmapsh backend track](https://roadmap.sh/projects/blogging-platform-api).
 You are required to create a simple RESTful API with basic CRUD operations for a personal blogging platform. CRUD stands for Create, Read, Update, and Delete.
 
+Demo
+
+![](./blog-api/swag-screenshot.png)
+
 ### Goals
 
 - The goals of this project are to help you:
@@ -119,3 +123,112 @@ You are required to create a simple RESTful API with basic CRUD operations for a
 - Learn how to perform CRUD operations using an API
 
 - Learn how to work with databases
+
+##### Running the app
+
+**Prerequisites**
+
+Before you begin, ensure you have the following installed:
+
+- Docker
+- Docker Compose
+
+**Installation & Setup**
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/Rioba-Ian/roadmap-sh-backend.git
+   cd roadmap-sh-backend/blog-api
+   ```
+
+2. Create a `.env.prod` file in the `blog-api` directory with the following environment variables:
+
+   ```bash
+   # Database Configuration
+   DB_USER=postgres
+   DB_PASSWORD=yourpassword
+   DB_NAME=blog_db
+   DB_HOST=postgres_db
+   DB_PORT=5432
+   ```
+
+   **Environment Variables Explained:**
+   - `DB_USER`: PostgreSQL database user (default: postgres)
+   - `DB_PASSWORD`: PostgreSQL database password (set a strong password)
+   - `DB_NAME`: Name of the PostgreSQL database
+   - `DB_HOST`: Database host address (use `postgres_db` when running via Docker Compose)
+   - `DB_PORT`: PostgreSQL port (default: 5432)
+
+3. Run the application with Docker Compose:
+
+   ```bash
+   docker-compose up
+   ```
+
+   This command will:
+   - Build the Go application Docker image
+   - Start the PostgreSQL database container
+   - Start the blog-api application container
+   - Set up networking between the containers
+
+4. The API will be available at `http://localhost:8080`
+
+5. Access the Swagger documentation at `http://localhost:8080/swagger/index.html`
+
+**Testing the API**
+
+You can test the API using curl:
+
+```bash
+# Get all posts
+curl http://localhost:8080/posts/
+
+# Create a new post
+curl -X POST http://localhost:8080/posts/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My First Post",
+    "content": "This is my first blog post",
+    "category": "Technology",
+    "tags": ["golang", "api"]
+  }'
+
+# Get a specific post (replace {id} with actual post ID)
+curl http://localhost:8080/posts/{id}
+
+# Update a post
+curl -X PUT http://localhost:8080/posts/{id} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Updated Title",
+    "content": "Updated content",
+    "category": "Technology",
+    "tags": ["golang", "api", "updated"]
+  }'
+
+# Delete a post
+curl -X DELETE http://localhost:8080/posts/{id}
+```
+
+**Stopping the Application**
+
+To stop the running containers:
+
+```bash
+docker-compose down
+```
+
+To stop and remove all data (including the database):
+
+```bash
+docker-compose down -v
+```
+
+**Troubleshooting**
+
+- **Database connection issues**: Ensure the `DB_HOST` is set to `postgres_db` (the service name in docker-compose.yml)
+- **Port already in use**: If port 8080 or 5432 is already in use, modify the port mappings in `docker-compose.yml`
+- **Database not ready**: The docker-compose file includes a health check. Wait for the database to be healthy before the API starts.
+
+For more information about the project, visit the [Roadmap.sh Backend Track](https://roadmap.sh/projects/blogging-platform-api).

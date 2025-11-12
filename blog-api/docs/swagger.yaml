@@ -130,29 +130,6 @@ paths:
       summary: Delete a post
       tags:
       - home
-    put:
-      consumes:
-      - application/json
-      description: Update a post
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/httputil.HTTPError'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/httputil.HTTPError'
-      summary: Update a post
-      tags:
-      - home
-  /posts/{id}{id}:
     get:
       consumes:
       - application/json
@@ -173,6 +150,28 @@ paths:
           schema:
             $ref: '#/definitions/httputil.HTTPError'
       summary: Get a Post by ID
+      tags:
+      - home
+    put:
+      consumes:
+      - application/json
+      description: Update a post
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Update a post
       tags:
       - home
 securityDefinitions:
