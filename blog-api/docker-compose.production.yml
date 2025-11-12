@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   blog-api:
-    image: ${DOCKER_USERNAME}/blog:latest
+    image: riobaian/blog:latest
     container_name: blog-api-prod
     ports:
       - '8080:8080'
