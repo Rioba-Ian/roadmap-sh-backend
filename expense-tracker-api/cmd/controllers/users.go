@@ -6,6 +6,5 @@ import (
 )
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Fprintf(w, "will display endpoint for all")
+	fmt.Fprintf(w, "get users")
 }

@@ -4,9 +4,11 @@ import (
 	"log"
 
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/api"
+	"github.com/Rioba-Ian/expense-tracker-api/cmd/database"
 )
 
 func main() {
+	database.InitDB()
 	server := api.NewApiServer(":8080")
 
 	log.Printf("Server listening on localhost:8080")
