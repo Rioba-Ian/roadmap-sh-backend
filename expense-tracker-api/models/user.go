@@ -11,5 +11,5 @@ type User struct {
 	Token         *string   `json:"token"`
 	Refresh_token *string   `json:"refresh_token"`
 	Created_at    time.Time `json:"created_at"`
-	Updated_at    time.Time `json:"created_at"`
+	Updated_at    time.Time `json:"updated_at"`
 }

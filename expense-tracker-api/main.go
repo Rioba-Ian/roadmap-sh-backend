@@ -5,9 +5,14 @@ import (
 
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/api"
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/database"
+	"github.com/Rioba-Ian/expense-tracker-api/config"
+	"github.com/Rioba-Ian/expense-tracker-api/helpers"
 )
 
 func main() {
+	jwtKey := config.GenerateRandomKey()
+	helpers.SetJWTKey(jwtKey)
+
 	database.InitDB()
 	server := api.NewApiServer(":8080")
 
