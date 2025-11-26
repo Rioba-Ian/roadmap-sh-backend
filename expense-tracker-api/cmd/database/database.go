@@ -10,32 +10,56 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func InitDB() {
+var DB *sql.DB
 
-	if err := godotenv.Load(); err != nil {
+func InitDB() {
+	var err error
+	if err = godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	connString := os.Getenv("GOOSE_DBSTRING")
 
-	db, err := sql.Open("postgres", connString)
+	DB, err = sql.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer db.Close()
+	DB.SetMaxOpenConns(20)
+	DB.SetMaxIdleConns(10)
+	DB.SetConnMaxLifetime(0)
 
-	if err = db.Ping(); err != nil {
+	if err = DB.Ping(); err != nil {
 		log.Fatal("Error connecting to the database", err)
 	}
 
 	fmt.Println("Successfully connected to the database!")
 
-	rows, err := db.Query("SELECT * FROM users")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
+	// rows, err := db.Query("SELECT * FROM users")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer rows.Close()
 
-	fmt.Println(rows.Next())
+	// fmt.Println(rows.Next())
+}
+
+func GetDB() *sql.DB {
+	if DB == nil {
+		log.Fatal("Database not initialized.")
+	}
+	return DB
+}
+
+func CloseDB() {
+	if DB == nil {
+		return
+	}
+
+	if err := DB.Close(); err != nil {
+		log.Fatalf("error closing db conn: %w", err)
+	}
+
+	log.Println("Database connection closed.")
+
 }

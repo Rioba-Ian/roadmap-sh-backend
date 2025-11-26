@@ -2,7 +2,6 @@ package helpers
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -45,7 +44,6 @@ func ValidateToken(tokenString string) (*Claims, error) {
 }
 
 func GenerateTokens(email, userID string) (string, string) {
-	log.Printf("JWT Key %v Type: %T", jwtKey, jwtKey)
 
 	claims := &Claims{
 		Email:  email,

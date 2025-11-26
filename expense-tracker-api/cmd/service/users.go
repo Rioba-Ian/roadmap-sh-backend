@@ -7,3 +7,7 @@ func GetUser() error {
 func GetUserExpenses() error {
 	return nil
 }
+
+// func CreateUser() (user models.User) {
+
+// }
