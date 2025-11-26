@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -50,6 +51,50 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	newUser.Token = accessToken
 	newUser.Refresh_token = refreshToken
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	var foundUser models.User
+	db := database.GetDB()
+
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if user.Email == "" || user.Password == "" {
+		http.Error(w, "email and password is required", http.StatusBadRequest)
+		return
+	}
+
+	row := db.QueryRow("SELECT id, email, password_hash FROM users WHERE email = $1", user.Email)
+	if err := row.Scan(&foundUser.ID, &foundUser.Email, &foundUser.PasswordHash); err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "User not found", http.StatusNotFound)
+			return
+		} else {
+			http.Error(w, "Unknown error occured", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	passwordIsValid, msg := helpers.VerifyPassword(foundUser.PasswordHash, user.Password)
+	if !passwordIsValid {
+		http.Error(w, msg.Error(), http.StatusBadRequest)
+		return
+	}
+	fmt.Println("row::", row)
+
+	accessToken, refreshToken := helpers.GenerateTokens(foundUser.Email, foundUser.ID)
+	foundUser.Token = accessToken
+	foundUser.Refresh_token = refreshToken
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	// TODO: convert found user object to public user object
+	json.NewEncoder(w).Encode(foundUser)
 }

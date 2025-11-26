@@ -20,6 +20,7 @@ func (h *Handler) RegisterUser() *http.ServeMux {
 
 	r.HandleFunc("GET /", controllers.GetUsers)
 	r.HandleFunc("POST /signup/", controllers.CreateUser)
+	r.HandleFunc("POST /login/", controllers.Login)
 
 	return r
 }
