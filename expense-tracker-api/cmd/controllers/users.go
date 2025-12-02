@@ -14,6 +14,16 @@ import (
 )
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID, ok := ctx.Value("userID").(string)
+
+	if !ok {
+		http.Error(w, "userId not found in context", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("userid:: %s\n", userID)
+	log.Println("userId:: %s", userID)
 	fmt.Fprintf(w, "get users")
 }
 
@@ -89,7 +99,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, msg.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println("row::", row)
 
 	accessToken, refreshToken := helpers.GenerateTokens(foundUser.Email, foundUser.ID)
 	foundUser.Token = accessToken

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/controllers"
+	"github.com/Rioba-Ian/expense-tracker-api/cmd/middlewares"
 )
 
 type Handler struct {
@@ -18,7 +19,7 @@ func NewHandler() *Handler {
 func (h *Handler) RegisterUser() *http.ServeMux {
 	r := http.NewServeMux()
 
-	r.HandleFunc("GET /", controllers.GetUsers)
+	r.Handle("GET /", middlewares.Authenticate(http.HandlerFunc(controllers.GetUsers)))
 	r.HandleFunc("POST /signup/", controllers.CreateUser)
 	r.HandleFunc("POST /login/", controllers.Login)
 
