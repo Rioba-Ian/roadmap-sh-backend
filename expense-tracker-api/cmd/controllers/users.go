@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/database"
+	"github.com/Rioba-Ian/expense-tracker-api/cmd/service"
 	"github.com/Rioba-Ian/expense-tracker-api/helpers"
 	"github.com/Rioba-Ian/expense-tracker-api/models"
 )
@@ -35,7 +36,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 
 	var err error
-	dbQuery := `INSERT INTO users (first_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, inserted_at, updated_at`
+	dbQuery := `INSERT INTO users (first_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, created_at, updated_at`
 
 	row := db.QueryRow(dbQuery, newUser.First_name, newUser.Email, newUser.PasswordHash)
 	if err = row.Scan(&newUser.ID, &newUser.Created_at, &newUser.Updated_at); err != nil {
@@ -51,9 +52,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	newUser.Token = accessToken
 	newUser.Refresh_token = refreshToken
+	userRes := newUser.ToUserPublic()
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newUser)
+	json.NewEncoder(w).Encode(userRes)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -92,9 +94,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	accessToken, refreshToken := helpers.GenerateTokens(foundUser.Email, foundUser.ID)
 	foundUser.Token = accessToken
 	foundUser.Refresh_token = refreshToken
+	service.UpdateUserTokens(accessToken, refreshToken, foundUser.ID)
+	userRes := foundUser.ToUserPublic()
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	// TODO: convert found user object to public user object
-	json.NewEncoder(w).Encode(foundUser)
+	json.NewEncoder(w).Encode(userRes)
 }

@@ -27,11 +27,16 @@ CREATE TRIGGER set_updated_at_expenses
 BEFORE UPDATE ON expenses
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at_to_now();
+
+CREATE TRIGGER set_updated_at_users
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at_to_now();
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-ALTER TABLE expenses drop index fk_user;
-DROP TABLE expenses;
+ALTER TABLE expenses DROP CONSTRAINT fk_user;
+DROP TABLE IF EXISTS expenses;
 DROP FUNCTION IF EXISTS set_updated_at_to_now() CASCADE;
 -- +goose StatementEnd

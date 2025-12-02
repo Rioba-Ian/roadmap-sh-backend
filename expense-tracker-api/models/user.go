@@ -14,3 +14,19 @@ type User struct {
 	Created_at    time.Time `json:"created_at"`
 	Updated_at    time.Time `json:"updated_at"`
 }
+
+type UserPublic struct {
+	ID            string `json:"id"`
+	Email         string `json:"email"`
+	Token         string `json:"token"`
+	Refresh_token string `json:"refresh_token"`
+}
+
+func (u *User) ToUserPublic() UserPublic {
+	return UserPublic{
+		ID:            u.ID,
+		Email:         u.Email,
+		Token:         u.Token,
+		Refresh_token: u.Refresh_token,
+	}
+}
