@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
+
+	"github.com/Rioba-Ian/expense-tracker-api/cmd/service"
+	"github.com/Rioba-Ian/expense-tracker-api/models"
 )
 
 func GetExpenses(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +18,42 @@ func GetExpenses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("userId:: %s", userID)
+	expenses, err := service.UserExpenses(userID)
 
-	fmt.Fprintf(w, "get expenses")
+	if err != nil {
+		http.Error(w, "could not retrieve expenses", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(expenses)
+}
+
+func CreateExpense(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID, ok := ctx.Value("userID").(string)
+
+	if !ok {
+		http.Error(w, "userId not found in context", http.StatusInternalServerError)
+		return
+	}
+
+	var newExpense *models.Expense
+	// var err error
+	if err := json.NewDecoder(r.Body).Decode(&newExpense); err != nil {
+		fmt.Println("new expense:: ", newExpense.ExpenseDate.Format("2025-12-02"))
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	newExpense, err := service.CreateExpense(newExpense, userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(newExpense)
 }

@@ -1,13 +1,22 @@
 package routes
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/Rioba-Ian/expense-tracker-api/cmd/controllers"
+	"github.com/Rioba-Ian/expense-tracker-api/cmd/middlewares"
+)
 
 func RegisterExpenses() *http.ServeMux {
 	r := http.NewServeMux()
 
-	r.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Still in progress"))
-	})
+	r.Handle("GET /", middlewares.Authenticate(
+		http.HandlerFunc(controllers.GetExpenses),
+	))
+
+	r.Handle("POST /", middlewares.Authenticate(
+		http.HandlerFunc(controllers.CreateExpense),
+	))
 
 	return r
 }

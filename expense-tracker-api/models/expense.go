@@ -8,4 +8,6 @@ type Expense struct {
 	Amount      string    `json:"amount"`
 	Descripiton string    `json:"description"`
 	ExpenseDate time.Time `json:"expense_date"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
