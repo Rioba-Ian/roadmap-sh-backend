@@ -24,7 +24,16 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("userid:: %s\n", userID)
 	log.Println("userId:: %s", userID)
-	fmt.Fprintf(w, "get users")
+	user, err := service.GetUser(userID)
+	if err != nil {
+		http.Error(w, "could not find user details", http.StatusInternalServerError)
+		return
+	}
+
+	userRes := user.ToUserPublic()
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(userRes)
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -110,4 +119,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: convert found user object to public user object
 	json.NewEncoder(w).Encode(userRes)
+}
+
+func UpdateUserDetails(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+	// var foundUser models.User
+	// db := database.GetDB()
+
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 }

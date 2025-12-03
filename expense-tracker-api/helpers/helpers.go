@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -89,4 +90,11 @@ func VerifyPassword(foundPwd, pwd string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(foundPwd), []byte(pwd))
 
 	return err == nil, err
+}
+
+// get environment go app is running
+func IsProd() bool {
+	prod := os.Getenv("APP_ENV")
+
+	return prod == "production"
 }

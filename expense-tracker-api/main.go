@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	config.LoadEnv()
 	jwtKey := config.GenerateRandomKey()
 	helpers.SetJWTKey(jwtKey)
 
