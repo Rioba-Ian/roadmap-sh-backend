@@ -49,18 +49,18 @@ func CreateExpense(newExpense *models.Expense, userId string) (*models.Expense, 
 
 	query := `
 INSERT INTO expenses (amount, description, expense_date, user_id)
-VALUES ($1, $2, $3, $4) RETURNING id, amount, description, expense_date, user_id
+VALUES ($1, $2, $3, $4) RETURNING id, amount, description, expense_date, user_id, created_at, updated_at
 	`
 	intAmount, err := strconv.Atoi(newExpense.Amount)
 	if err != nil {
 		log.Printf("cannot convert amount to number")
 	}
-	row := db.QueryRow(query, intAmount, expense.Descripiton,
-		expense.ExpenseDate, userId,
+	row := db.QueryRow(query, intAmount, newExpense.Descripiton,
+		newExpense.ExpenseDate, userId,
 	)
 
 	if err := row.Scan(&expense.ID, &expense.Amount, &expense.Descripiton,
-		&expense.ExpenseDate, &expense.UserID); err != nil {
+		&expense.ExpenseDate, &expense.UserID, &expense.CreatedAt, &expense.UpdatedAt); err != nil {
 		log.Printf("error creating new expense", err)
 		return nil, err
 	}
