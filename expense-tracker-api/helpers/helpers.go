@@ -3,6 +3,7 @@ package helpers
 import (
 	"errors"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -44,7 +45,7 @@ func ValidateToken(tokenString string) (*Claims, error) {
 	return nil, errors.New("invalid token")
 }
 
-func GenerateTokens(email, userID string) (string, string) {
+func GenerateTokens(email, userID string) (string, string, error) {
 
 	claims := &Claims{
 		Email:  email,
@@ -63,16 +64,16 @@ func GenerateTokens(email, userID string) (string, string) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedAccesToken, err := accessToken.SignedString(jwtKey)
 	if err != nil {
-		panic(err)
+		return "", "", err
 	}
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims)
 	signedRefreshToken, err := refreshToken.SignedString(jwtKey)
 	if err != nil {
-		panic(err)
+		return "", "", err
 	}
 
-	return signedAccesToken, signedRefreshToken
+	return signedAccesToken, signedRefreshToken, nil
 
 }
 
@@ -90,6 +91,37 @@ func VerifyPassword(foundPwd, pwd string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(foundPwd), []byte(pwd))
 
 	return err == nil, err
+}
+
+func CheckPasswordStrength(pwd string) error {
+	// abcUpper := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	// abcLower := strings.ToLower(abcUpper)
+	// numericChars := ""
+	//
+	if len(pwd) < 8 {
+		return errors.New("password length should be at least 8 characters long")
+	}
+
+	if !regexp.MustCompile(`[A-Z]`).MatchString(pwd) {
+		return errors.New("password length should contain at least an uppercase letter")
+	}
+
+	// At least one lowercase letter
+	if !regexp.MustCompile(`[a-z]`).MatchString(pwd) {
+		return errors.New("password length should contain at least a lowercase letter")
+	}
+
+	// At least one digit
+	if !regexp.MustCompile(`[0-9]`).MatchString(pwd) {
+		return errors.New("password length should contain at least a numeric character")
+	}
+
+	// At least one special character (adjust as needed)
+	if !regexp.MustCompile(`[!@#$%^&*()]`).MatchString(pwd) {
+		return errors.New("password length should contain at least a symbol !@#$%^&*()")
+	}
+
+	return nil
 }
 
 // get environment go app is running

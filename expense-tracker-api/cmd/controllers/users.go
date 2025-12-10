@@ -44,8 +44,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if newUser.First_name == "" || newUser.Password == "" || newUser.Email == "" {
+	if newUser.FirstName == "" || newUser.Password == "" || newUser.Email == "" {
 		http.Error(w, "first name, password and email are required", http.StatusBadRequest)
+		return
+	}
+
+	if err := helpers.CheckPasswordStrength(newUser.Password); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -57,8 +62,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var err error
 	dbQuery := `INSERT INTO users (first_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, created_at, updated_at`
 
-	row := db.QueryRow(dbQuery, newUser.First_name, newUser.Email, newUser.PasswordHash)
-	if err = row.Scan(&newUser.ID, &newUser.Created_at, &newUser.Updated_at); err != nil {
+	row := db.QueryRow(dbQuery, newUser.FirstName, newUser.Email, newUser.PasswordHash)
+	if err = row.Scan(&newUser.ID, &newUser.CreatedAt, &newUser.UpdatedAt); err != nil {
 		log.Printf("error scanning row", err.Error())
 	}
 	if err != nil {
@@ -67,10 +72,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, refreshToken := helpers.GenerateTokens(newUser.Email, newUser.ID)
+	accessToken, refreshToken, err := helpers.GenerateTokens(newUser.Email, newUser.ID)
+
+	if err != nil {
+		log.Fatalf("failed to create user tokens::", err)
+		http.Error(w, "Failed to create user tokens", http.StatusInternalServerError)
+		return
+	}
 
 	newUser.Token = accessToken
-	newUser.Refresh_token = refreshToken
+	newUser.RefreshToken = refreshToken
 	userRes := newUser.ToUserPublic()
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -109,9 +120,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, refreshToken := helpers.GenerateTokens(foundUser.Email, foundUser.ID)
+	accessToken, refreshToken, err := helpers.GenerateTokens(foundUser.Email, foundUser.ID)
+
+	if err != nil {
+		log.Fatalf("failed to create user tokens::", err)
+		http.Error(w, "Failed to create user tokens", http.StatusInternalServerError)
+		return
+	}
+
 	foundUser.Token = accessToken
-	foundUser.Refresh_token = refreshToken
+	foundUser.RefreshToken = refreshToken
 	service.UpdateUserTokens(accessToken, refreshToken, foundUser.ID)
 	userRes := foundUser.ToUserPublic()
 	w.Header().Set("Content-Type", "application/json")
