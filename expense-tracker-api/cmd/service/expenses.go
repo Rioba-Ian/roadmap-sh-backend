@@ -59,7 +59,7 @@ where users.id = $1 and e.id = $2
 
 	if err := row.Scan(&e.ID, &e.UserID,
 		&e.Amount, &e.Descripiton, &e.ExpenseDate, &e.CreatedAt, &e.UpdatedAt); err != nil {
-		log.Printf("error scanning row for expense details", err.Error())
+		log.Printf("error scanning row for expense details: %v", err)
 		return nil, err
 	}
 

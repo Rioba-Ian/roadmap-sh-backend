@@ -64,7 +64,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	row := db.QueryRow(dbQuery, newUser.FirstName, newUser.Email, newUser.PasswordHash)
 	if err = row.Scan(&newUser.ID, &newUser.CreatedAt, &newUser.UpdatedAt); err != nil {
-		log.Printf("error scanning row", err.Error())
+		log.Printf("error scanning row: %v", err)
 	}
 	if err != nil {
 		log.Printf("Database insert error:: %w", err)
@@ -75,7 +75,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	accessToken, refreshToken, err := helpers.GenerateTokens(newUser.Email, newUser.ID)
 
 	if err != nil {
-		log.Fatalf("failed to create user tokens::", err)
+		log.Fatalf("failed to create user tokens:: %v", err)
 		http.Error(w, "Failed to create user tokens", http.StatusInternalServerError)
 		return
 	}
@@ -114,16 +114,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	passwordIsValid, msg := helpers.VerifyPassword(foundUser.PasswordHash, user.Password)
+	passwordIsValid, _ := helpers.VerifyPassword(foundUser.PasswordHash, user.Password)
 	if !passwordIsValid {
-		http.Error(w, msg.Error(), http.StatusBadRequest)
+
+		http.Error(w, "invalid email/password", http.StatusBadRequest)
 		return
 	}
 
 	accessToken, refreshToken, err := helpers.GenerateTokens(foundUser.Email, foundUser.ID)
 
 	if err != nil {
-		log.Fatalf("failed to create user tokens::", err)
+		log.Fatalf("failed to create user tokens:: %v", err)
 		http.Error(w, "Failed to create user tokens", http.StatusInternalServerError)
 		return
 	}

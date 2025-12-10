@@ -14,7 +14,7 @@ func GetUser(userId string) (*models.User, error) {
 	// query := "SELECT first_name, last_name, email FROM users WHERE id = ?"
 	row := db.QueryRow("SELECT id, first_name, email FROM users WHERE id = $1", userId)
 	if err := row.Scan(&user.ID, &user.FirstName, &user.Email); err != nil {
-		log.Printf("error scanning row for getting user: ", err.Error())
+		log.Printf("error scanning row for getting user: %v", err)
 		return nil, err
 	}
 
