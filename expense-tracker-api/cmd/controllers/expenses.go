@@ -86,7 +86,6 @@ func CreateExpense(w http.ResponseWriter, r *http.Request) {
 	var newExpense *models.Expense
 	// var err error
 	if err := json.Unmarshal(body, &newExpense); err != nil {
-		fmt.Println("new expense:: ", newExpense.ExpenseDate.Format("2025-12-02"))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -98,13 +97,13 @@ func CreateExpense(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(createdExpense)
 }
 
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	_, ok := ctx.Value("userID").(string)
+	userId, ok := ctx.Value("userID").(string)
 	expenseId := r.PathValue("id")
 
 	if !ok {
@@ -117,11 +116,16 @@ func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := service.DeleteExpense(expenseId)
+	err := service.DeleteExpense(userId, expenseId)
 
 	if err != nil {
-		http.Error(w, "unexpected error occured", http.StatusInternalServerError)
-		return
+		if err == sql.ErrNoRows {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		} else {
+			http.Error(w, "unexpected error occured", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

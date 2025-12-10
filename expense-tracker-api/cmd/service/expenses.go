@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"log"
 	"strconv"
 
@@ -28,7 +29,7 @@ where users.id = $1
 		// var u models.User
 		if err := rows.Scan(&e.ID, &e.UserID, &e.Amount,
 			&e.Descripiton, &e.ExpenseDate, &e.CreatedAt, &e.UpdatedAt); err != nil {
-			log.Fatalln("could not return expenses for user")
+			log.Printf("could not return expenses for user %w", err)
 			return nil, err
 		}
 		expenses = append(expenses, e)
@@ -76,9 +77,10 @@ func CreateExpense(newExpense *models.Expense, userId string) (*models.Expense, 
 INSERT INTO expenses (amount, description, expense_date, user_id)
 VALUES ($1, $2, $3, $4) RETURNING id, amount, description, expense_date, user_id, created_at, updated_at
 	`
-	intAmount, err := strconv.Atoi(newExpense.Amount)
+	intAmount, err := strconv.ParseFloat(newExpense.Amount, 64)
 	if err != nil {
-		log.Printf("cannot convert amount to number")
+		log.Printf("cannot convert amount to number %v", err)
+		return nil, err
 	}
 	row := db.QueryRow(query, intAmount, newExpense.Descripiton,
 		newExpense.ExpenseDate, userId,
@@ -93,17 +95,27 @@ VALUES ($1, $2, $3, $4) RETURNING id, amount, description, expense_date, user_id
 	return &expense, nil
 }
 
-func DeleteExpense(id string) error {
+func DeleteExpense(userId, id string) error {
 	db := database.GetDB()
 	query := `
 	DELETE FROM expenses
-	WHERE id = $1
+	WHERE id = $1 AND user = $2
 	`
 
-	_, err := db.Exec(query, id)
+	result, err := db.Exec(query, id, userId)
 	if err != nil {
 		log.Printf("error deleting expense record", id)
 		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
 	}
 
 	return nil

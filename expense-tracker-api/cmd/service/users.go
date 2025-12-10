@@ -28,10 +28,11 @@ func GetUserExpenses() error {
 func UpdateUserTokens(token, refreshToken, userId string) error {
 	db := database.GetDB()
 
-	row := db.QueryRow("UPDATE users SET token = $1, refresh_token = $2 WHERE id = $3", token, refreshToken, userId)
-	if err := row.Err(); err != nil {
+	_, err := db.Exec("UPDATE users SET token = $1, refresh_token = $2 WHERE id = $3", token, refreshToken, userId)
+	if err != nil {
 		return err
 	}
+	defer db.Close()
 	return nil
 }
 

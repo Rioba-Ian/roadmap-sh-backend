@@ -75,7 +75,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	accessToken, refreshToken, err := helpers.GenerateTokens(newUser.Email, newUser.ID)
 
 	if err != nil {
-		log.Fatalf("failed to create user tokens:: %v", err)
+		log.Printf("failed to create user tokens:: %v", err)
 		http.Error(w, "Failed to create user tokens", http.StatusInternalServerError)
 		return
 	}
@@ -114,24 +114,36 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	passwordIsValid, _ := helpers.VerifyPassword(foundUser.PasswordHash, user.Password)
+	passwordIsValid, err := helpers.VerifyPassword(foundUser.PasswordHash, user.Password)
 	if !passwordIsValid {
-
 		http.Error(w, "invalid email/password", http.StatusBadRequest)
+		return
+	}
+
+	if err != nil {
+		log.Printf("error occured in verifying password %w", err)
+		http.Error(w, "unexpected error occurred", http.StatusInternalServerError)
 		return
 	}
 
 	accessToken, refreshToken, err := helpers.GenerateTokens(foundUser.Email, foundUser.ID)
 
 	if err != nil {
-		log.Fatalf("failed to create user tokens:: %v", err)
+		log.Printf("failed to create user tokens:: %v", err)
 		http.Error(w, "Failed to create user tokens", http.StatusInternalServerError)
 		return
 	}
 
 	foundUser.Token = accessToken
 	foundUser.RefreshToken = refreshToken
-	service.UpdateUserTokens(accessToken, refreshToken, foundUser.ID)
+	err = service.UpdateUserTokens(accessToken, refreshToken, foundUser.ID)
+
+	if err != nil {
+		log.Printf("failed to update user tokens:: %v", err)
+		http.Error(w, "Failed to update user tokens", http.StatusInternalServerError)
+		return
+	}
+
 	userRes := foundUser.ToUserPublic()
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
