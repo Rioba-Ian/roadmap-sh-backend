@@ -41,6 +41,31 @@ where users.id = $1
 	return expenses, nil
 }
 
+func UserExpenseId(userId, expenseId string) (*models.Expense, error) {
+	db := database.GetDB()
+	var e models.Expense
+
+	query := `
+select e.id, e.user_id, e.amount, e.description, e.expense_date, e.created_at, e.updated_at
+from expenses as e
+left join users on e.user_id = users.id
+where users.id = $1 and e.id = $2
+	`
+	row := db.QueryRow(query, userId, expenseId)
+	if err := row.Err(); err != nil {
+		log.Printf("error getting expense for user ", err, userId)
+		return nil, err
+	}
+
+	if err := row.Scan(&e.ID, &e.UserID,
+		&e.Amount, &e.Descripiton, &e.ExpenseDate, &e.CreatedAt, &e.UpdatedAt); err != nil {
+		log.Printf("error scanning row for expense details", err.Error())
+		return nil, err
+	}
+
+	return &e, nil
+}
+
 func CreateExpense(newExpense *models.Expense, userId string) (*models.Expense, error) {
 	db := database.GetDB()
 	var expense models.Expense
@@ -66,4 +91,20 @@ VALUES ($1, $2, $3, $4) RETURNING id, amount, description, expense_date, user_id
 	}
 
 	return &expense, nil
+}
+
+func DeleteExpense(id string) error {
+	db := database.GetDB()
+	query := `
+	DELETE FROM expenses
+	WHERE id = $1
+	`
+
+	_, err := db.Exec(query, id)
+	if err != nil {
+		log.Printf("error deleting expense record", id)
+		return err
+	}
+
+	return nil
 }

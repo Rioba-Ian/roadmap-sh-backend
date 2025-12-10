@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -31,6 +32,40 @@ func GetExpenses(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(expenses)
 }
 
+func GetExpense(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID, ok := ctx.Value("userID").(string)
+
+	if !ok {
+		http.Error(w, "userId not found in context", http.StatusInternalServerError)
+		return
+	}
+
+	expenseId := r.PathValue("id")
+	if expenseId == "" {
+		http.Error(w, "id not found", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("expense with id::", expenseId)
+
+	expense, err := service.UserExpenseId(userID, expenseId)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			http.Error(w, "could not find expense "+expenseId, http.StatusNotFound)
+			return
+		} else {
+			http.Error(w, "error fetching expense ", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(&expense)
+}
+
 func CreateExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userID, ok := ctx.Value("userID").(string)
@@ -56,8 +91,6 @@ func CreateExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(newExpense)
-
 	createdExpense, err := service.CreateExpense(newExpense, userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -67,4 +100,30 @@ func CreateExpense(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(createdExpense)
+}
+
+func DeleteExpense(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	_, ok := ctx.Value("userID").(string)
+	expenseId := r.PathValue("id")
+
+	if !ok {
+		http.Error(w, "userId not found in context", http.StatusInternalServerError)
+		return
+	}
+
+	if expenseId == "" {
+		http.Error(w, "id not found", http.StatusBadRequest)
+		return
+	}
+
+	err := service.DeleteExpense(expenseId)
+
+	if err != nil {
+		http.Error(w, "unexpected error occured", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
 }
