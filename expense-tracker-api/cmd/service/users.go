@@ -42,7 +42,6 @@ func (s *UserService) UpdateUserTokens(token, refreshToken, userId string) error
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 	return nil
 }
 
@@ -54,9 +53,22 @@ func (s *UserService) LogOutUser(token, userId string) error {
 		return err
 	}
 
-	defer db.Close()
-
 	return nil
+}
+
+// TODO: Complete black list logic
+func (s *UserService) CheckBlackListed(token, userId string) bool {
+	db := s.DB
+	var blacklistToken string
+
+	row := db.QueryRow("SELECT blacklist FROM users WHERE id = $1 AND blacklist = $2", userId, token)
+	if err := row.Scan(&blacklistToken); err != nil {
+		if err == sql.ErrNoRows {
+			return false
+		}
+	}
+
+	return false
 }
 
 // func UpdateUser(userId string) (*models.User, error) {

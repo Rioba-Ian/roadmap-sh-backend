@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -26,7 +27,7 @@ func InitDB() *sql.DB {
 
 	DB.SetMaxOpenConns(20)
 	DB.SetMaxIdleConns(10)
-	DB.SetConnMaxLifetime(0)
+	DB.SetConnMaxLifetime(time.Hour)
 
 	if err = DB.Ping(); err != nil {
 		log.Fatal("Error connecting to the database", err)

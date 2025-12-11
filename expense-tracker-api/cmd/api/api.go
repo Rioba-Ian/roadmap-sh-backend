@@ -20,15 +20,14 @@ func NewApiServer(addr string, db *sql.DB) *ApiServer {
 }
 
 func (s *ApiServer) Run() error {
-	userHandler := routes.NewHandler(s.DB)
-	expenseHandler := routes.NewHandler(s.DB)
+	handler := routes.NewHandler(s.DB)
 
-	userRouter := userHandler.RegisterUser()
-	expenseRoutes := expenseHandler.RegisterExpenses()
+	userHandler := handler.RegisterUser()
+	expenseHandler := handler.RegisterExpenses()
 
 	router := http.NewServeMux()
-	router.Handle("/users/", http.StripPrefix("/users", userRouter))
-	router.Handle("/expenses/", http.StripPrefix("/expenses", expenseRoutes))
+	router.Handle("/users/", http.StripPrefix("/users", userHandler))
+	router.Handle("/expenses/", http.StripPrefix("/expenses", expenseHandler))
 
 	return http.ListenAndServe(s.addr, router)
 }

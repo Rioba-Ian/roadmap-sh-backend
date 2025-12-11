@@ -12,21 +12,23 @@ func (h *Handler) RegisterExpenses() *http.ServeMux {
 	r := http.NewServeMux()
 
 	expenseService := service.NewExpenseService(h.DB)
+	userService := service.NewUserService(h.DB)
 	expenseController := controllers.NewExpenseController(expenseService)
+	middlewareHandler := middlewares.NewMiddleWare(userService)
 
-	r.Handle("GET /{id}", middlewares.Authenticate(
+	r.Handle("GET /{id}", middlewareHandler.Authenticate(
 		http.HandlerFunc(expenseController.GetExpense),
 	))
 
-	r.Handle("GET /", middlewares.Authenticate(
+	r.Handle("GET /", middlewareHandler.Authenticate(
 		http.HandlerFunc(expenseController.GetExpenses),
 	))
 
-	r.Handle("POST /", middlewares.Authenticate(
+	r.Handle("POST /", middlewareHandler.Authenticate(
 		http.HandlerFunc(expenseController.CreateExpense),
 	))
 
-	r.Handle("DELETE /{id}", middlewares.Authenticate(
+	r.Handle("DELETE /{id}", middlewareHandler.Authenticate(
 		http.HandlerFunc(expenseController.DeleteExpense),
 	))
 

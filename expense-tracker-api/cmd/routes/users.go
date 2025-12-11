@@ -24,16 +24,21 @@ func (h *Handler) RegisterUser() *http.ServeMux {
 
 	userService := service.NewUserService(h.DB)
 	userController := controllers.NewUserController(userService)
+	middlewareHandler := middlewares.NewMiddleWare(userService)
 
-	r.Handle("GET /", middlewares.Authenticate(
+	r.Handle("GET /", middlewareHandler.Authenticate(
 		http.HandlerFunc(userController.GetUsers)),
 	)
-	r.HandleFunc("POST /signup/",
+	r.HandleFunc("POST /signup",
 		userController.CreateUser,
 	)
-	r.HandleFunc("POST /login/",
+	r.HandleFunc("POST /login",
 		userController.Login,
 	)
+
+	r.Handle("POST /logout", middlewareHandler.Authenticate(
+		http.HandlerFunc(userController.Logout),
+	))
 
 	return r
 }

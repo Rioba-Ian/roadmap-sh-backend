@@ -37,7 +37,7 @@ where users.id = $1
 		var e models.Expense
 		// var u models.User
 		if err := rows.Scan(&e.ID, &e.UserID, &e.Amount,
-			&e.Descripiton, &e.ExpenseDate, &e.CreatedAt, &e.UpdatedAt); err != nil {
+			&e.Description, &e.ExpenseDate, &e.CreatedAt, &e.UpdatedAt); err != nil {
 			log.Printf("could not return expenses for user %w", err)
 			return nil, err
 		}
@@ -68,7 +68,7 @@ where users.id = $1 and e.id = $2
 	}
 
 	if err := row.Scan(&e.ID, &e.UserID,
-		&e.Amount, &e.Descripiton, &e.ExpenseDate, &e.CreatedAt, &e.UpdatedAt); err != nil {
+		&e.Amount, &e.Description, &e.ExpenseDate, &e.CreatedAt, &e.UpdatedAt); err != nil {
 		log.Printf("error scanning row for expense details: %v", err)
 		return nil, err
 	}
@@ -91,11 +91,11 @@ VALUES ($1, $2, $3, $4) RETURNING id, amount, description, expense_date, user_id
 		log.Printf("cannot convert amount to number %v", err)
 		return nil, err
 	}
-	row := db.QueryRow(query, intAmount, newExpense.Descripiton,
+	row := db.QueryRow(query, intAmount, newExpense.Description,
 		newExpense.ExpenseDate, userId,
 	)
 
-	if err := row.Scan(&expense.ID, &expense.Amount, &expense.Descripiton,
+	if err := row.Scan(&expense.ID, &expense.Amount, &expense.Description,
 		&expense.ExpenseDate, &expense.UserID, &expense.CreatedAt, &expense.UpdatedAt); err != nil {
 		log.Printf("error creating new expense", err)
 		return nil, err
@@ -108,7 +108,7 @@ func (s *ExpenseService) DeleteExpense(userId, id string) error {
 	db := s.DB
 	query := `
 	DELETE FROM expenses
-	WHERE id = $1 AND user = $2
+	WHERE id = $1 AND user_id = $2
 	`
 
 	result, err := db.Exec(query, id, userId)
