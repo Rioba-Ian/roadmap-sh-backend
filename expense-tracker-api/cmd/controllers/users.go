@@ -171,3 +171,29 @@ func (c *UserController) UpdateUserDetails(w http.ResponseWriter, r *http.Reques
 	}
 
 }
+
+func (c *UserController) Logout(w http.ResponseWriter, r *http.Request) {
+	var user models.UserPublic
+
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	userID, ok := r.Context().Value("userID").(string)
+
+	if !ok {
+		http.Error(w, "userId not found in context", http.StatusInternalServerError)
+		return
+	}
+
+	if err := c.UserService.LogOutUser(user.Token, userID); err != nil {
+		log.Printf("could not logout user %s:: %v", userID, err)
+		http.Error(w, "unexpected error occured", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("ok"))
+}

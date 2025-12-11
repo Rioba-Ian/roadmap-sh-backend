@@ -46,6 +46,19 @@ func (s *UserService) UpdateUserTokens(token, refreshToken, userId string) error
 	return nil
 }
 
+func (s *UserService) LogOutUser(token, userId string) error {
+	db := s.DB
+
+	_, err := db.Exec("UPDATE users SET blacklist = $1 WHERE id = $2", token, userId)
+	if err != nil {
+		return err
+	}
+
+	defer db.Close()
+
+	return nil
+}
+
 // func UpdateUser(userId string) (*models.User, error) {
 // 	db := database.GetDB()
 // 	var user models.User
