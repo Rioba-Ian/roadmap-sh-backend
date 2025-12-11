@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/routes"
@@ -8,19 +9,22 @@ import (
 
 type ApiServer struct {
 	addr string
+	DB   *sql.DB
 }
 
-func NewApiServer(addr string) *ApiServer {
+func NewApiServer(addr string, db *sql.DB) *ApiServer {
 	return &ApiServer{
 		addr: addr,
+		DB:   db,
 	}
 }
 
 func (s *ApiServer) Run() error {
-	userHandler := routes.NewHandler()
+	userHandler := routes.NewHandler(s.DB)
+	expenseHandler := routes.NewHandler(s.DB)
 
 	userRouter := userHandler.RegisterUser()
-	expenseRoutes := routes.RegisterExpenses()
+	expenseRoutes := expenseHandler.RegisterExpenses()
 
 	router := http.NewServeMux()
 	router.Handle("/users/", http.StripPrefix("/users", userRouter))

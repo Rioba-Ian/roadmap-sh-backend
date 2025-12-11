@@ -10,9 +10,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
-
-func InitDB() {
+func InitDB() *sql.DB {
+	var DB *sql.DB
 	var err error
 	if err = godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
@@ -35,31 +34,25 @@ func InitDB() {
 
 	fmt.Println("Successfully connected to the database!")
 
-	// rows, err := db.Query("SELECT * FROM users")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer rows.Close()
-
-	// fmt.Println(rows.Next())
-}
-
-func GetDB() *sql.DB {
-	if DB == nil {
-		log.Fatal("Database not initialized.")
-	}
 	return DB
 }
 
-func CloseDB() {
-	if DB == nil {
-		return
-	}
+// func GetDB() *sql.DB {
+// 	if DB == nil {
+// 		log.Fatal("Database not initialized.")
+// 	}
+// 	return DB
+// }
 
-	if err := DB.Close(); err != nil {
-		log.Printf("error closing db conn: %w", err)
-	}
+// func CloseDB() {
+// 	if DB == nil {
+// 		return
+// 	}
 
-	log.Println("Database connection closed.")
+// 	if err := DB.Close(); err != nil {
+// 		log.Printf("error closing db conn: %w", err)
+// 	}
 
-}
+// 	log.Println("Database connection closed.")
+
+// }

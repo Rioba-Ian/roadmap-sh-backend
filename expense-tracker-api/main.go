@@ -14,8 +14,9 @@ func main() {
 	jwtKey := config.GenerateRandomKey()
 	helpers.SetJWTKey(jwtKey)
 
-	database.InitDB()
-	server := api.NewApiServer(":8080")
+	db := database.InitDB()
+	defer db.Close()
+	server := api.NewApiServer(":8080", db)
 
 	log.Printf("Server listening on localhost:8080")
 	if err := server.Run(); err != nil {

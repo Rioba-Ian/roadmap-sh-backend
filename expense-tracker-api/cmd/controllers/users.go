@@ -7,13 +7,22 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Rioba-Ian/expense-tracker-api/cmd/database"
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/service"
 	"github.com/Rioba-Ian/expense-tracker-api/helpers"
 	"github.com/Rioba-Ian/expense-tracker-api/models"
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+type UserController struct {
+	UserService *service.UserService
+}
+
+func NewUserController(u *service.UserService) *UserController {
+	return &UserController{
+		UserService: u,
+	}
+}
+
+func (c *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userID, ok := ctx.Value("userID").(string)
 
@@ -24,7 +33,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("userid:: %s\n", userID)
 	log.Println("userId:: %s", userID)
-	user, err := service.GetUser(userID)
+	user, err := c.UserService.GetUser(userID)
 	if err != nil {
 		http.Error(w, "could not find user details", http.StatusInternalServerError)
 		return
@@ -36,7 +45,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(userRes)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func (c *UserController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var newUser models.User
 
 	if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
@@ -57,7 +66,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	hashedPassword := helpers.HashPassword(&newUser.Password)
 	newUser.PasswordHash = *hashedPassword
 
-	db := database.GetDB()
+	db := c.UserService.DB
 
 	var err error
 	dbQuery := `INSERT INTO users (first_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, created_at, updated_at`
@@ -67,7 +76,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("error scanning row: %v", err)
 	}
 	if err != nil {
-		log.Printf("Database insert error:: %w", err)
+		log.Printf("Database insert error:: %v", err)
 		http.Error(w, "Failed to create user", http.StatusBadRequest)
 		return
 	}
@@ -88,10 +97,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(userRes)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func (c *UserController) Login(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	var foundUser models.User
-	db := database.GetDB()
+	db := c.UserService.DB
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -136,7 +145,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	foundUser.Token = accessToken
 	foundUser.RefreshToken = refreshToken
-	err = service.UpdateUserTokens(accessToken, refreshToken, foundUser.ID)
+	err = c.UserService.UpdateUserTokens(accessToken, refreshToken, foundUser.ID)
 
 	if err != nil {
 		log.Printf("failed to update user tokens:: %v", err)
@@ -152,10 +161,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(userRes)
 }
 
-func UpdateUserDetails(w http.ResponseWriter, r *http.Request) {
+func (c *UserController) UpdateUserDetails(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	// var foundUser models.User
-	// db := database.GetDB()
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

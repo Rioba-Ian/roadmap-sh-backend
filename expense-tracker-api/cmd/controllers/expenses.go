@@ -11,7 +11,17 @@ import (
 	"github.com/Rioba-Ian/expense-tracker-api/models"
 )
 
-func GetExpenses(w http.ResponseWriter, r *http.Request) {
+type ExpenseController struct {
+	ExpenseService *service.ExpenseService
+}
+
+func NewExpenseController(e *service.ExpenseService) *ExpenseController {
+	return &ExpenseController{
+		ExpenseService: e,
+	}
+}
+
+func (c *ExpenseController) GetExpenses(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userID, ok := ctx.Value("userID").(string)
 
@@ -20,7 +30,7 @@ func GetExpenses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expenses, err := service.UserExpenses(userID)
+	expenses, err := c.ExpenseService.UserExpenses(userID)
 
 	if err != nil {
 		http.Error(w, "could not retrieve expenses", http.StatusInternalServerError)
@@ -32,7 +42,7 @@ func GetExpenses(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(expenses)
 }
 
-func GetExpense(w http.ResponseWriter, r *http.Request) {
+func (c *ExpenseController) GetExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userID, ok := ctx.Value("userID").(string)
 
@@ -49,7 +59,7 @@ func GetExpense(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("expense with id::", expenseId)
 
-	expense, err := service.UserExpenseId(userID, expenseId)
+	expense, err := c.ExpenseService.UserExpenseId(userID, expenseId)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -66,7 +76,7 @@ func GetExpense(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&expense)
 }
 
-func CreateExpense(w http.ResponseWriter, r *http.Request) {
+func (c *ExpenseController) CreateExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userID, ok := ctx.Value("userID").(string)
 	body, err := io.ReadAll(r.Body)
@@ -90,7 +100,7 @@ func CreateExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdExpense, err := service.CreateExpense(newExpense, userID)
+	createdExpense, err := c.ExpenseService.CreateExpense(newExpense, userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -101,7 +111,7 @@ func CreateExpense(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(createdExpense)
 }
 
-func DeleteExpense(w http.ResponseWriter, r *http.Request) {
+func (c *ExpenseController) DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userId, ok := ctx.Value("userID").(string)
 	expenseId := r.PathValue("id")
@@ -116,7 +126,7 @@ func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := service.DeleteExpense(userId, expenseId)
+	err := c.ExpenseService.DeleteExpense(userId, expenseId)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

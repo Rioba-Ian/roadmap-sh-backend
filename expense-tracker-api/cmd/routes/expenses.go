@@ -5,25 +5,29 @@ import (
 
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/controllers"
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/middlewares"
+	"github.com/Rioba-Ian/expense-tracker-api/cmd/service"
 )
 
-func RegisterExpenses() *http.ServeMux {
+func (h *Handler) RegisterExpenses() *http.ServeMux {
 	r := http.NewServeMux()
 
+	expenseService := service.NewExpenseService(h.DB)
+	expenseController := controllers.NewExpenseController(expenseService)
+
 	r.Handle("GET /{id}", middlewares.Authenticate(
-		http.HandlerFunc(controllers.GetExpense),
+		http.HandlerFunc(expenseController.GetExpense),
 	))
 
 	r.Handle("GET /", middlewares.Authenticate(
-		http.HandlerFunc(controllers.GetExpenses),
+		http.HandlerFunc(expenseController.GetExpenses),
 	))
 
 	r.Handle("POST /", middlewares.Authenticate(
-		http.HandlerFunc(controllers.CreateExpense),
+		http.HandlerFunc(expenseController.CreateExpense),
 	))
 
 	r.Handle("DELETE /{id}", middlewares.Authenticate(
-		http.HandlerFunc(controllers.DeleteExpense),
+		http.HandlerFunc(expenseController.DeleteExpense),
 	))
 
 	return r

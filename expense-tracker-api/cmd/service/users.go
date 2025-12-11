@@ -1,14 +1,24 @@
 package service
 
 import (
+	"database/sql"
 	"log"
 
-	"github.com/Rioba-Ian/expense-tracker-api/cmd/database"
 	"github.com/Rioba-Ian/expense-tracker-api/models"
 )
 
-func GetUser(userId string) (*models.User, error) {
-	db := database.GetDB()
+type UserService struct {
+	DB *sql.DB
+}
+
+func NewUserService(db *sql.DB) *UserService {
+	return &UserService{
+		DB: db,
+	}
+}
+
+func (s *UserService) GetUser(userId string) (*models.User, error) {
+	db := s.DB
 	var user models.User
 
 	// query := "SELECT first_name, last_name, email FROM users WHERE id = ?"
@@ -25,8 +35,8 @@ func GetUserExpenses() error {
 	return nil
 }
 
-func UpdateUserTokens(token, refreshToken, userId string) error {
-	db := database.GetDB()
+func (s *UserService) UpdateUserTokens(token, refreshToken, userId string) error {
+	db := s.DB
 
 	_, err := db.Exec("UPDATE users SET token = $1, refresh_token = $2 WHERE id = $3", token, refreshToken, userId)
 	if err != nil {

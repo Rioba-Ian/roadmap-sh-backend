@@ -5,12 +5,21 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/Rioba-Ian/expense-tracker-api/cmd/database"
 	"github.com/Rioba-Ian/expense-tracker-api/models"
 )
 
-func UserExpenses(userId string) ([]models.Expense, error) {
-	db := database.GetDB()
+type ExpenseService struct {
+	DB *sql.DB
+}
+
+func NewExpenseService(db *sql.DB) *ExpenseService {
+	return &ExpenseService{
+		DB: db,
+	}
+}
+
+func (s *ExpenseService) UserExpenses(userId string) ([]models.Expense, error) {
+	db := s.DB
 	var expenses []models.Expense
 
 	query := `
@@ -42,8 +51,8 @@ where users.id = $1
 	return expenses, nil
 }
 
-func UserExpenseId(userId, expenseId string) (*models.Expense, error) {
-	db := database.GetDB()
+func (s *ExpenseService) UserExpenseId(userId, expenseId string) (*models.Expense, error) {
+	db := s.DB
 	var e models.Expense
 
 	query := `
@@ -67,8 +76,8 @@ where users.id = $1 and e.id = $2
 	return &e, nil
 }
 
-func CreateExpense(newExpense *models.Expense, userId string) (*models.Expense, error) {
-	db := database.GetDB()
+func (s *ExpenseService) CreateExpense(newExpense *models.Expense, userId string) (*models.Expense, error) {
+	db := s.DB
 	var expense models.Expense
 
 	log.Println("new expense userId", newExpense.ExpenseDate, userId)
@@ -95,8 +104,8 @@ VALUES ($1, $2, $3, $4) RETURNING id, amount, description, expense_date, user_id
 	return &expense, nil
 }
 
-func DeleteExpense(userId, id string) error {
-	db := database.GetDB()
+func (s *ExpenseService) DeleteExpense(userId, id string) error {
+	db := s.DB
 	query := `
 	DELETE FROM expenses
 	WHERE id = $1 AND user = $2
