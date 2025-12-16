@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/routes"
@@ -29,5 +30,5 @@ func (s *ApiServer) Run() error {
 	router.Handle("/users/", http.StripPrefix("/users", userHandler))
 	router.Handle("/expenses/", http.StripPrefix("/expenses", expenseHandler))
 
-	return http.ListenAndServe(s.addr, router)
+	return http.ListenAndServe(fmt.Sprintf(":%s", s.addr), router)
 }

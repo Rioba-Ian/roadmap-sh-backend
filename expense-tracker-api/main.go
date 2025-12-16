@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/api"
 	"github.com/Rioba-Ian/expense-tracker-api/cmd/database"
@@ -16,9 +17,10 @@ func main() {
 
 	db := database.InitDB()
 	defer db.Close()
-	server := api.NewApiServer(":8080", db)
+	port := os.Getenv("PORT")
+	server := api.NewApiServer(port, db)
 
-	log.Printf("Server listening on localhost:8080")
+	log.Printf("Server listening on localhost %s", port)
 	if err := server.Run(); err != nil {
 		log.Fatal("Failed to start http server", err)
 	}
