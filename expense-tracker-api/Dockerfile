@@ -24,7 +24,7 @@ COPY db/migrations ./db/migrations
 
 # Copy the entrypoint script
 COPY docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
+RUN apk --no-cache add wget && chmod +x docker-entrypoint.sh
 
 ENTRYPOINT [ "./docker-entrypoint.sh" ]
 CMD [ "/app/bin/api" ]
