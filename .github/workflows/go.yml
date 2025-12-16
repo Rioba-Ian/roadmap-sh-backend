@@ -78,6 +78,25 @@ jobs:
         run: go build -o blog-api
       # - name: Test
       #   run: go test -v ./...
+      #
+  expense-tracker-api:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.expense-tracker-api == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./expense-tracker-api
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+      - name: Build
+        run: go build -o expense-tracker-api
+      # - name: Test
+      #   run: go test -v ./...
 
   build-all:
     needs: detect-changes
@@ -96,3 +115,4 @@ jobs:
           go build -o build/guess-game ./go-number-guessing
           go build -o build/weather-api ./weather-api-service
           go build -o build/blog-api ./blog-api
+          go build -o build/expense-tracker-api ./expense-tracker-api

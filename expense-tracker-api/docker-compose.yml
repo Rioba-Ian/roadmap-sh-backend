@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:15-alpine
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      interval: 1s
+      timeout: 5s
+      retries: 5
+
+  expense-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    env_file:
+      - .env
+    environment:
+      GOOSE_DBSTRING: postgres://${DB_USER}:${DB_PASSWORD}@postgres_db:5432/${DB_NAME}?sslmode=disable
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    entrypoint: ['./docker-entrypoint.sh']
+    command: ['/app/bin/api']
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge

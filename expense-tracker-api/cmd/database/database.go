@@ -7,16 +7,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func InitDB() *sql.DB {
 	var DB *sql.DB
 	var err error
-	if err = godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	connString := os.Getenv("GOOSE_DBSTRING")
 
