@@ -18,9 +18,12 @@ func main() {
 	db := database.InitDB()
 	defer db.Close()
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	server := api.NewApiServer(port, db)
 
-	log.Printf("Server listening on localhost %s", port)
+	log.Printf("Server listening on port %s", port)
 	if err := server.Run(); err != nil {
 		log.Fatal("Failed to start http server", err)
 	}
