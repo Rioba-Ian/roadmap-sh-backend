@@ -5,7 +5,7 @@ services:
     image: riobaian/expense-tracker-api
     container_name: expense-tracker-api-prod
     ports:
-      - '8080:8080'
+      - '8081:8081'
     environment:
       GOOSE_DBSTRING: postgres://${DB_USER}:${DB_PASSWORD}@postgres_db:5432/${DB_NAME}?sslmode=disable
     entrypoint: ['/bin/sh', '-c']
@@ -32,7 +32,7 @@ services:
           '--quiet',
           '--tries=1',
           '--spider',
-          'http://localhost:8080/',
+          'http://0.0.0.0:8081/',
         ]
       interval: 30s
       timeout: 10s
