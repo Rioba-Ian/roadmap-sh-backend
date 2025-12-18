@@ -20,7 +20,7 @@ func main() {
 	port := os.Getenv("PORT")
 	log.Printf("port provided is %s\n", port)
 	if port == "" {
-		port = "8080"
+		port = "8081"
 	}
 	server := api.NewApiServer(port, db)
 
