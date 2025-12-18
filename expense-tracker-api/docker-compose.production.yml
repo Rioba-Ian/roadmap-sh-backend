@@ -1,6 +1,6 @@
 services:
   expense-api:
-    image: riobaian/expense-tracker-api
+    image: riobaian/expense-tracker-api:latest
     container_name: expense-tracker-api-prod
     ports:
       - '8081:8081'
