@@ -18,6 +18,7 @@ func main() {
 	db := database.InitDB()
 	defer db.Close()
 	port := os.Getenv("PORT")
+	log.Printf("port provided is %s\n", port)
 	if port == "" {
 		port = "8080"
 	}

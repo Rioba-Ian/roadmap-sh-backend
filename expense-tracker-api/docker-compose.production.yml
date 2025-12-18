@@ -18,7 +18,6 @@ services:
         echo "Running database migrations with Goose..."
         goose -version
         echo "Using connection string: $$GOOSE_DBSTRING"
-        goose -dir /app/db/migrations status
         goose -dir /app/db/migrations up
         echo "Migrations applied."
         echo "Starting application..."
