@@ -8,7 +8,8 @@ sleep 5
 # Run the goose migrations
 echo "Running database migrations with Goose..."
 export GOOSE_DRIVER=postgres
-export GOOSE_DBSTRING=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+export GOOSE_DBSTRING=postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable
+entrypoint: ['/bin/sh', '-c']
 goose -version
 echo "Using connection string: ${GOOSE_DBSTRING}"
 goose status
