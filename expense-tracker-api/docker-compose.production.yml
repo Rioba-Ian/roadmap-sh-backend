@@ -7,17 +7,18 @@ services:
     ports:
       - '8080:8080'
     environment:
-      GOOSE_DBSTRING: postgres://${DB_USER}:${DB_PASSWORD}@postgres_db:5432/${DB_NAME}?sslmode=disable
+      GOOSE_DBSTRING: postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}?sslmode=disable
     entrypoint: ['/bin/sh', '-c']
     command:
       - |
         echo "Waiting for database to be ready..."
         sleep 5
+        export GOOSE_DRIVER=postgres
         echo "Running database migrations with Goose..."
         goose -version
         echo "Using connection string: $$GOOSE_DBSTRING"
-        goose -dir /app/db/migrations status
-        goose -dir /app/db/migrations up
+        goose status
+        goose up
         echo "Migrations applied."
         echo "Starting application..."
         exec /app/bin/api
